@@ -2,6 +2,7 @@ import React from 'react'
 import MainCrosel from '../../components/HomeCarosel/MainCrosel'
 import HomeSectionCarosel from '../../components/HomeSectionCarosel/HomeSectionCarosel'
 import { mens_kurta } from '../../../Data/mens_kurta'
+import { mensShoesPage1 } from '../../../Data/shoes'
 const HomePage = () => {
   return (
     <div>

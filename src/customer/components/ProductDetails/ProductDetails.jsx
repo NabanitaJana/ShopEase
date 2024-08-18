@@ -1,35 +1,17 @@
-/*
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    theme: {
-      extend: {
-        gridTemplateRows: {
-          '[auto,auto,1fr]': 'auto auto 1fr',
-        },
-      },
-    },
-    plugins: [
-      // ...
-      require('@tailwindcss/aspect-ratio'),
-    ],
-  }
-  ```
-*/
+
 'use client'
 
-import { useState } from 'react'
-import { StarIcon } from '@heroicons/react/20/solid'
+import { useEffect, useState } from 'react'
 import { Radio, RadioGroup } from '@headlessui/react'
 import {Box, Rating ,Grid, LinearProgress} from '@mui/material'
 import Button from '@mui/material/Button';
 import ProductReviewCard from './ProductReviewCard'
 import { mens_kurta } from '../../../Data/mens_kurta'
 import HomeSectionCard from '../HomeSectionCard/HomeSectionCard'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { findProductsById } from '../../../State/Product/Action'
+import { addItemToCart } from '../../../State/Cart/Action';
 
 const product = {
   name: 'Basic Tee 6-Pack',
@@ -86,12 +68,23 @@ function classNames(...classes) {
 }
 
 export default function ProductDetails() {
-  const [selectedColor, setSelectedColor] = useState(product.colors[0])
-  const [selectedSize, setSelectedSize] = useState(product.sizes[2])
+  const [selectedSize, setSelectedSize] = useState("");
   const navigate=useNavigate();
+  const params=useParams();
+  const dispatch=useDispatch();
+  const {products}=useSelector(store=>store)
+
+  console.log("...",params.productId);
   const handleAddToCart=()=>{
+    const data={productId:params.productId,size:selectedSize.name}
+    console.log("data--",data)
+    dispatch(addItemToCart(data))
     navigate("/cart")
   }
+  useEffect(()=>{
+    const data={productId:params.productId}
+    dispatch(findProductsById(data))
+  },[params.productId])
 
   return (
     <div className="bg-white lg:px-20">
@@ -129,8 +122,8 @@ export default function ProductDetails() {
             <div className="flex flex-col items-center">
             <div className="overflow-hidden rounded-lg max-w-[30rem] max-h-[35rem]">
             <img
-              alt={product.images[0].alt}
-              src={product.images[0].src}
+              src={products?.product?.imageUrl}
+              alt=""
               className="h-full w-full object-cover object-center"
             />
           </div>
@@ -147,9 +140,11 @@ export default function ProductDetails() {
                 {/* Product info */}
         <div className="lg:col-span-1 maxt-auto max-w-2xl px-4 pb-16 sm:px-6 lg:mx-w-7xl lg:px-8 lg:pb-24">
           <div className="lg:col-span-2 ">
-            <h1 className="text-lg lg:text-xl font-semibold text-gray-900 ">Aelomart</h1>
+            <h1 className="text-lg lg:text-xl font-semibold text-gray-900 ">
+              {" "}
+              {products.product?.brand}</h1>
             <h1 className='text-lg lg:text-xl text-gray-900 opacity-60 pt-1'>
-                Casual Regular Sleeves Solid Women White Top</h1>
+            {products.product?.title}</h1>
           </div>
 
           {/* Options */}
@@ -157,13 +152,13 @@ export default function ProductDetails() {
             <h2 className="sr-only">Product information</h2>
             <div className='flex space-x-5 items-center text-lg lg:text-xl text-gray-900 mt-6'>
             <p className='font-semibold'>
-            ₹199
+            {products.product?.discountedPrice}
             </p>
             <p className='opacity-50 line-through '>
-            ₹211
+            {products.product?.price}
             </p>
             <p className='text-green-600 font-semibold '>
-            5% off
+            {products.product?.discountPresent}% off
             </p>
             </div>
             {/* Reviews */}
